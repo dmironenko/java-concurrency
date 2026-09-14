@@ -9,8 +9,8 @@ public class Programmer implements Runnable {
   private final int id;
 
   private final FoodService foodService;
-  private final int maxEatingDelayMs;
   private int foodEaten;
+  private final int maxEatingDelayMs;
 
   private final Spoon firstPrioritySpoon, secondPrioritySpoon;
 
@@ -19,8 +19,8 @@ public class Programmer implements Runnable {
     this.id = id;
 
     this.foodService = foodService;
-    this.maxEatingDelayMs = maxEatingDelayMs;
     this.foodEaten = 0;
+    this.maxEatingDelayMs = maxEatingDelayMs;
 
     if (firstSpoon.getId() < secondSpoon.getId()) {
       this.firstPrioritySpoon = firstSpoon;

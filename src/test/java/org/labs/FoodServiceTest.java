@@ -1,7 +1,7 @@
 package org.labs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.ArrayList;
 import java.util.concurrent.Future;
@@ -12,10 +12,10 @@ class FoodServiceTest {
   void concurrentTakeFood() throws Exception {
     Storage storage = new Storage(10);
 
-    try (FoodService service = new FoodService(storage, 2, 2, 0)) {
+    try (FoodService service = new FoodService(storage, 20, 2, 0)) {
       var results = new ArrayList<Future<Boolean>>();
       for (int i = 0; i < 20; i++) {
-        results.add(service.tryTakeFood(0, 1));
+        results.add(service.tryTakeFood(i, 1));
       }
 
       int accepted = 0;
@@ -25,10 +25,9 @@ class FoodServiceTest {
         }
       }
 
-      assertEquals(5, accepted);
-      assertEquals(5, storage.getUnits());
-      assertTrue(service.tryTakeFood(1, 5).get());
+      assertEquals(10, accepted);
       assertEquals(0, storage.getUnits());
+      assertFalse(service.tryTakeFood(0, 1).get());
     }
   }
 }

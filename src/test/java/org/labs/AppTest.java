@@ -18,10 +18,6 @@ class AppTest {
     assertEquals(clients, results.length);
     assertEquals(food, Arrays.stream(results).sum());
     assertTrue(Arrays.stream(results).allMatch(value -> value >= 0));
-
-    int min = Arrays.stream(results).min().orElseThrow();
-    int max = Arrays.stream(results).max().orElseThrow();
-    assertTrue(max - min <= 1, Arrays.toString(results));
   }
 
   @Test

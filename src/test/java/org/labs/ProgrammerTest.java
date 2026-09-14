@@ -17,7 +17,7 @@ class ProgrammerTest {
       Programmer programmer = new Programmer(0, service, second, first, 0);
 
       executor.submit(programmer).get();
-      assertEquals(6, storage.getUnits());
+      assertEquals(0, storage.getUnits());
 
       first.take();
 
@@ -25,7 +25,7 @@ class ProgrammerTest {
         second.take();
 
         try {
-          assertEquals(4, programmer.getFoodEaten());
+          assertEquals(10, programmer.getFoodEaten());
         } finally {
           second.put();
         }

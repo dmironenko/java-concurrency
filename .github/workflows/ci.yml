@@ -7,8 +7,22 @@ on:
     branches: [ master ]
 
 jobs:
-  test:
+  check:
+    name: ${{ matrix.name }}
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: code style
+            command: ./gradlew spotlessCheck --no-daemon
+
+          - name: lint
+            command: ./gradlew pmdMain pmdTest --no-daemon
+
+          - name: tests
+            command: ./gradlew test --no-daemon
 
     steps:
       - name: checkout repo
@@ -20,8 +34,8 @@ jobs:
           java-version: 21
           distribution: temurin
 
-      - name: chmod gradlew
+      - name: make gradlew executable
         run: chmod +x gradlew
 
-      - name: build
-        run: ./gradlew build --no-daemon
+      - name: check
+        run: ${{ matrix.command }}

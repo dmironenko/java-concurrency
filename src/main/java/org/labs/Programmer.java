@@ -4,70 +4,68 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class Programmer implements Runnable {
-    private final int id;
-    
-    private final FoodService foodService;
-    private int foodEaten;
-    
-    private final Spoon firstPrioritySpoon, secondPrioritySpoon;
+  private final int id;
 
-    public Programmer(int id, FoodService foodService, Spoon firstSpoon, Spoon secondSpoon) {
-        this.id = id;
+  private final FoodService foodService;
+  private int foodEaten;
 
-        this.foodService = foodService;
-        this.foodEaten = 0;
+  private final Spoon firstPrioritySpoon, secondPrioritySpoon;
 
-        if (firstSpoon.getId() < secondSpoon.getId()) {
-            this.firstPrioritySpoon = firstSpoon;
-            this.secondPrioritySpoon = secondSpoon;
-        } else {
-            this.firstPrioritySpoon = secondSpoon;
-            this.secondPrioritySpoon = firstSpoon;
+  public Programmer(int id, FoodService foodService, Spoon firstSpoon, Spoon secondSpoon) {
+    this.id = id;
+
+    this.foodService = foodService;
+    this.foodEaten = 0;
+
+    if (firstSpoon.getId() < secondSpoon.getId()) {
+      this.firstPrioritySpoon = firstSpoon;
+      this.secondPrioritySpoon = secondSpoon;
+    } else {
+      this.firstPrioritySpoon = secondSpoon;
+      this.secondPrioritySpoon = firstSpoon;
+    }
+  }
+
+  public int getId() {
+    return this.id;
+  }
+
+  public int getFoodEaten() {
+    return this.foodEaten;
+  }
+
+  @Override
+  public void run() {
+    while (true) {
+      Future<Boolean> foodFutureResponse = this.foodService.tryTakeFood(this.id, 1);
+
+      boolean foodResponse;
+      try {
+        foodResponse = foodFutureResponse.get();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        return;
+      } catch (ExecutionException e) {
+        throw new IllegalStateException("failed to get food", e.getCause());
+      }
+
+      if (!foodResponse) {
+        return;
+      }
+
+      this.firstPrioritySpoon.take();
+
+      try {
+        this.secondPrioritySpoon.take();
+
+        try {
+          this.foodEaten++;
+        } finally {
+          this.secondPrioritySpoon.put();
         }
+      } finally {
+        this.firstPrioritySpoon.put();
+      }
     }
-
-    public int getId() {
-        return this.id;
-    }
-
-    public int getFoodEaten() {
-        return this.foodEaten;
-    }
-
-    @Override
-    public void run() {
-        while (true) {
-            Future<Boolean> foodFutureResponse = this.foodService.tryTakeFood(this.id, 1);
-        
-            boolean foodResponse;
-            try {
-                foodResponse = foodFutureResponse.get();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return;
-            } catch (ExecutionException e) {
-                throw new IllegalStateException(
-                    "failed to get food", e.getCause()
-                );
-            }
-
-            if (!foodResponse) {
-                return;
-            }
-
-            this.firstPrioritySpoon.take();
-
-            try {
-                this.secondPrioritySpoon.take();
-
-                try {
-                    this.foodEaten++;
-                } finally {
-                    this.secondPrioritySpoon.put();
-                }
-            } finally {
-                this.firstPrioritySpoon.put();
-            }
-        }
-    }
+  }
 }

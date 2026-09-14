@@ -12,7 +12,7 @@ class FoodServiceTest {
   void concurrentTakeFood() throws Exception {
     Storage storage = new Storage(10);
 
-    try (FoodService service = new FoodService(storage, 2, 2)) {
+    try (FoodService service = new FoodService(storage, 2, 2, 0)) {
       var results = new ArrayList<Future<Boolean>>();
       for (int i = 0; i < 20; i++) {
         results.add(service.tryTakeFood(0, 1));

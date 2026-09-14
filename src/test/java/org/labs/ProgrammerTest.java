@@ -12,9 +12,9 @@ class ProgrammerTest {
     Spoon first = new Spoon(0);
     Spoon second = new Spoon(1);
 
-    try (FoodService service = new FoodService(storage, 3, 2);
+    try (FoodService service = new FoodService(storage, 3, 2, 0);
         var executor = Executors.newSingleThreadExecutor()) {
-      Programmer programmer = new Programmer(0, service, second, first);
+      Programmer programmer = new Programmer(0, service, second, first, 0);
 
       executor.submit(programmer).get();
       assertEquals(6, storage.getUnits());

@@ -1,0 +1,41 @@
+name: ci
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  check:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: code style
+            command: ./gradlew spotlessCheck --no-daemon
+
+          - name: lint
+            command: ./gradlew pmdMain pmdTest --no-daemon
+
+          - name: tests
+            command: ./gradlew test --no-daemon
+
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v7
+
+      - name: setup jdk
+        uses: actions/setup-java@v6
+        with:
+          java-version: 21
+          distribution: temurin
+
+      - name: make gradlew executable
+        run: chmod +x gradlew
+
+      - name: check
+        run: ${{ matrix.command }}

@@ -1,5 +1,7 @@
 plugins {
     id("java")
+    id("pmd")
+    id("com.diffplug.spotless") version "8.10.2"
 }
 
 group = "org.labs"
@@ -16,4 +18,14 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+spotless {
+    java {
+        googleJavaFormat()
+    }
+}
+
+pmd {
+    toolVersion = "7.27.0"
 }
